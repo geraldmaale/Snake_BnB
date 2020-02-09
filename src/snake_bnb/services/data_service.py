@@ -106,7 +106,7 @@ def get_available_cages(checkin: datetime.datetime, checkout: datetime.datetime,
 
 
 def book_cage(account, snake, cage, checkin, checkout):
-    booking:Booking = None
+    booking:Booking = Booking()
 
     for b in cage.bookings:
         if b.check_in_date <= checkin and b.check_out_date >= checkout and b.guest_snake_id is None:
@@ -119,23 +119,3 @@ def book_cage(account, snake, cage, checkin, checkout):
 
     cage.save()
 
-
-def get_bookings_for_user(email: str) -> List[Booking]:
-    account = find_account_by_email(email)
-
-    booked_cages = Cage.objects() \
-        .filter(bookings__guest_owner_id=account.id) \
-        .only('bookings', 'name')
-
-    def map_cage_to_booking(cage, booking):
-        booking.cage = cage
-        return booking
-
-    bookings = [
-        map_cage_to_booking(cage, booking)
-        for cage in booked_cages
-        for booking in cage.bookings
-        if booking.guest_owner_id == account.id
-    ]
-
-    return bookings

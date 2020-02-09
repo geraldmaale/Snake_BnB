@@ -3,7 +3,6 @@ from infrastructure.switchlang import switch
 import infrastructure.state as state
 import services.data_service as svc
 from dateutil import parser
-import datetime
 
 
 def run():
@@ -163,29 +162,12 @@ def update_availability():
 
 def view_bookings():
     print(' ****************** Your bookings **************** ')
-    if not state.active_account:
-        error_msg("You must log in first to register a cage")
-        return
 
-    cages = svc.find_cages_for_user(state.active_account)
+    # TODO: Require an account
+    # TODO: Get cages, and nested bookings as flat list
+    # TODO: Print details for each
 
-    bookings = [
-        (c, b)
-        for c in cages
-        for b in c.bookings
-        if b.booked_date is not None
-    ]
-
-    print("You have {} bookings.".format(len(bookings)))
-    for c, b in bookings:
-        print(' * Cage: {} is booked at {} from {} for {} days.'.format(
-            c.name,
-            b.booked_date.date(),
-            b.check_in_date.date(),
-            # datetime.date(b.booked_date.year, b.booked_date.month, b.booked_date.day),
-            # datetime.date(b.check_in_date.year, b.check_in_date.month, b.check_in_date.day),
-            b.duration_in_days
-        ))
+    print(" -------- NOT IMPLEMENTED -------- ")
 
 
 def exit_app():
