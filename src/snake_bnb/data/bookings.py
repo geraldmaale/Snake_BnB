@@ -1,13 +1,18 @@
-import mongoengine
+from mongoengine import *
 
 
-class Booking(mongoengine.EmbeddedDocument):
-    guest_owner_id = mongoengine.ObjectIdField()
-    guest_snake_id = mongoengine.ObjectIdField()
+class Booking(EmbeddedDocument):
+    guest_owner_id = ObjectIdField()
+    guest_snake_id = ObjectIdField()
 
-    booked_date = mongoengine.DateTimeField()
-    check_in_date = mongoengine.DateTimeField(required=True)
-    check_out_date = mongoengine.DateTimeField(required=True)
+    booked_date = DateTimeField()
+    check_in_date = DateTimeField(required=True)
+    check_out_date = DateTimeField(required=True)
 
-    review = mongoengine.StringField()
-    rating = mongoengine.IntField(default=0)
+    review = StringField()
+    rating = IntField(default=0)
+
+    @property
+    def duration_in_days(self):
+        dt = self.check_out_date- self.check_in_date
+        return dt.days

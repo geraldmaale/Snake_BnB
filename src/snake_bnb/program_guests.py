@@ -1,5 +1,6 @@
 from colorama import Fore
 from dateutil import parser
+import datetime
 
 from infrastructure.switchlang import switch
 import services.data_service as svc
@@ -123,7 +124,7 @@ def book_a_cage():
     print()
     for idx, s in enumerate(snakes):
         print('{}. {} (length: {}, venomous: {})'.format(
-            idx+1,
+            idx + 1,
             s.name,
             s.length,
             'yes' if s.is_venomous else 'no'
@@ -134,13 +135,13 @@ def book_a_cage():
         error_msg("Cancelled")
         return
 
-    snake = snakes[int(snake)-1]
+    snake = snakes[int(snake) - 1]
     cages = svc.get_available_cages(checkin, checkout, snake)
 
     print("There are {} cages available in that time.".format(len(cages)))
     for idx, c in enumerate(cages):
         print(" {}. {} with {}m carpeted: {}, has toys: {}.".format(
-            idx+1,
+            idx + 1,
             c.name,
             c.square_meters,
             'yes' if c.is_carpeted else 'no',
@@ -156,7 +157,7 @@ def book_a_cage():
         error_msg('Cancelled')
         return
 
-    cage = cages[int(cage)-1]
+    cage = cages[int(cage) - 1]
     if len(cage) < 0:
         error_msg("Sorry, there is not cage available for booking")
 
@@ -165,13 +166,23 @@ def book_a_cage():
     success_msg('Successfully booked {} for {} at ${}/night.'.format(cage.name, snake.name, cage.price))
 
 
-
 def view_bookings():
     print(' ****************** Your bookings **************** ')
-    # TODO: Require an account
-    # TODO: List booking info along with snake info
+    if not state.active_account:
+        error_msg("You must log in first to register a cage")
+        return
 
-    print(" -------- NOT IMPLEMENTED -------- ")
+    snakes = {s.id: s for s in svc.get_snakes_for_user(state.active_account.id)}
+    bookings = svc.get_bookings_for_user(state.active_account.email)
+
+    print("You have {} bookings.".format(len(bookings)))
+    for b in bookings:
+        print(' * Snake: {} is booked at {} from {} for {} days.'.format(
+            snakes.get(b.guest_snake_id).name,
+            b.cage.name,
+            datetime.date(b.check_in_date.year, b.check_in_date.month, b.check_in_date.day),
+            (b.check_out_date - b.check_in_date).days
+        ))
 
 
 def success_msg(text):
